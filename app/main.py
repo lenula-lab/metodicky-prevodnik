@@ -14,7 +14,7 @@ from app.utils.generate import process_inputs_and_generate, GenerationError
 
 app = FastAPI(title="Metodický převodník – výběrová řízení")
 
-BASE = Path(__file__).resolve().parent.parent
+BASE = Path(__file__).resolve().parent
 OUTPUTS = BASE / "outputs"
 OUTPUTS.mkdir(exist_ok=True, parents=True)
 
