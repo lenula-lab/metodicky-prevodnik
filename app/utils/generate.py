@@ -14,6 +14,17 @@ import re
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+META_PATTERNS = [
+    r"^Použij.*formát", r"^Nepopisuj", r"^Vytvoř tabulku", r"^Uveď",
+    r"^Text napiš", r"^Zdrojový text", r"^Vrať jen", r"^Vypiš"
+]
+
+def _strip_meta(text: str) -> str:
+    lines = text.splitlines()
+    cleaned = [l for l in lines if not any(re.search(p, l.strip(), flags=re.I) for p in META_PATTERNS)]
+    # když by náhodou zmizely všechny řádky, vrať původní
+    return "\n".join(cleaned) if any(s.strip() for s in cleaned) else text
+
 USE_AZURE_SPEECH = bool(os.getenv("AZURE_SPEECH_KEY"))
 
 class GenerationError(Exception):
@@ -224,6 +235,7 @@ async def process_inputs_and_generate(input_dir: Path, output_dir: Path, audienc
     attachments = _list_attachments(input_dir)
     prompt = _build_prompt(corpus, audience, style, attachments)
     text = await _call_llm(prompt)
+    text = _strip_meta(text)
 
     # Získat fáze pro schéma
     phases = _extract_phases_from_json_block(text)
