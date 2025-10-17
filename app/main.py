@@ -41,23 +41,22 @@ async def upload(
         input_dir = workdir / "input"
         input_dir.mkdir(parents=True, exist_ok=True)
 
-        if zipfile_input is not None:
+        if zipfile_input is not None and getattr(zipfile_input, "filename", ""):
             data = await zipfile_input.read()
-            with zipfile.ZipFile(io.BytesIO(data)) as zf:
-                zf.extractall(input_dir)
+            if data:
+                with zipfile.ZipFile(io.BytesIO(data)) as zf:
+                    zf.extractall(input_dir)
 
         if files:
             for f in files:
-            # přeskoč prázdné/nevložené položky
-            if not f or not getattr(f, "filename", ""):
-                continue
-            content = await f.read()
-            if not content:
-                continue
-            # ulož jen „basename“ (bez případných cest)
-            safe_name = Path(f.filename).name
-            (input_dir / safe_name).write_bytes(content)
-
+                if not f or not getattr(f, "filename", ""):
+                    continue
+                content = await f.read()
+                if not content:
+                    continue
+                safe_name = Path(f.filename).name
+                (input_dir / safe_name).write_bytes(content)
+                
         result = await process_inputs_and_generate(
             input_dir=input_dir,
             output_dir=workdir,
