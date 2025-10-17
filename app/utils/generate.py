@@ -149,21 +149,25 @@ def _make_docx(text: str, out_path: Path):
     doc.save(out_path)
 
 def _make_png_from_phases(output_dir: Path, phases: list[str]) -> str:
-     png_path = output_dir / "schema.png"
-     import matplotlib.pyplot as plt
-     import matplotlib.patches as patches
+    png_path = output_dir / "schema.png"
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+
     steps = phases[:14] if phases else ["Fáze 1", "Fáze 2"]
     fig, ax = plt.subplots(figsize=(9, max(6, 1.1*len(steps))))
     ax.axis('off')
     W, H = 0.82, 0.07; x = 0.09
     ys = [0.92 - i*0.08 for i in range(len(steps))]
     for i, (y, text) in enumerate(zip(ys, steps)):
-        rect = patches.FancyBboxPatch((x, y), W, H, boxstyle="round,pad=0.02,rounding_size=0.02",
+        rect = patches.FancyBboxPatch((x, y), W, H,
+                                      boxstyle="round,pad=0.02,rounding_size=0.02",
                                       linewidth=1, edgecolor="black", facecolor="white")
         ax.add_patch(rect)
-        ax.text(x + W/2, y + H/2, text, ha='center', va='center', wrap=True, fontsize=10)
+        ax.text(x + W/2, y + H/2, text, ha='center', va='center',
+                wrap=True, fontsize=10)
         if i < len(ys)-1:
-            ax.annotate("", xy=(x+W/2, y), xytext=(x+W/2, ys[i+1]+H),
+            ax.annotate("", xy=(x+W/2, y),
+                        xytext=(x+W/2, ys[i+1]+H),
                         arrowprops=dict(arrowstyle="->", lw=1))
     fig.savefig(png_path, dpi=200, bbox_inches="tight")
     return str(png_path)
