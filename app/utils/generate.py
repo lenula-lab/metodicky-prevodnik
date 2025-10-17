@@ -44,34 +44,31 @@ def _collect_corpus(input_dir: Path) -> str:
 
 def _build_prompt(corpus: str, audience: str, style: str, attachments: list[str]) -> str:
     return f"""
-Jsi český jazykový asistent, který z metodických pokynů vytváří stručné, srozumitelné návody pro administrativní pracovníky veřejné správy. Nepopisuj, co budeš dělat – výstup rovnou napiš.
+Napiš hotový a konkrétní návod v češtině pro administrativní pracovníky veřejné správy.
+Nepopisuj, co budeš dělat – rovnou napiš obsah. Neopakuj zadání ani slova jako
+„použij, napiš, uveď, vytvoř“. Nevkládej žádné vysvětlování úkolu.
 
-Použij následující formát a napiš konkrétní text, ne vysvětlení:
+Vrať jen tyto sekce s vyplněným obsahem (bez instrukcí):
 
 # Metodický převodník
 (zjednodušený výklad pro administrativní pracovníky)
 
 ## Úvod
-Shrň smysl a účel pokynu ve 2–5 větách (bez metatextu).
+2–5 vět o účelu a působnosti metodiky (bez metatextu).
 
 ## Přehled fází
-Vypiš skutečné fáze nebo kroky procesu z předaného textu.
-Každou popiš jednou větou, co se v ní děje.
+V bodech uveď skutečné fáze/kroky procesu z textu. Ke každé jedna věta, co se děje.
 
 ## Kroky a odpovědnosti
-Vytvoř tabulku:
+Tabulka v markdownu:
 | Kdo | Co | Jak | Do kdy | Přílohy |
-Vyplň ji reálnými informacemi z pokynu a příloh.
-Použij jen přílohy, které dávají smysl pro daný krok: {attachments}.
+Vyplň reálnými informacemi. „Přílohy“ vybírej jen z těchto názvů (pokud dávají smysl pro daný krok):
+{attachments}
 
 ## Na co si dát pozor
-Uveď 5–8 konkrétních bodů – nejčastější chyby, rizika, nebo důležité
-upozornění vyplývající z pokynu.
+5–8 konkrétních rizik/kontrolních bodů z metodiky.
 
-Text napiš v češtině, stručně, úředně a srozumitelně.
-Nepřidávej žádný úvod ani popis zadání, jen samotný výstup.
-
-Zdrojový text, ze kterého čerpáš:
+Zdrojový materiál (použij pro fakta, pojmy, role, lhůty a přílohy):
 {corpus}
 """
 
@@ -85,7 +82,12 @@ async def _call_llm(prompt: str) -> str:
         headers = {"api-key": azure_key, "Content-Type": "application/json"}
         payload = {
             "messages": [
-                {"role": "system", "content": "Jsi konzervativní asistent. Převádíš metodické pokyny do srozumitelné češtiny bez anglicismů pro pracovníky personálních útvarů."},
+                {"role": "system", "content": (
+                  "Jsi český úřední asistent. Tvoje odpověď NESMÍ obsahovat popisy typu "
+                  "‘vytvoř, vypiš, použij, v tomto dokumentu’. Rovnou napiš hotový obsah: "
+                  "zejména konkrétní fáze, kroky, role, termíny a přílohy. "
+                  "Piš stručně, úředně a srozumitelně, bez anglicismů."
+                )},
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.1,
@@ -102,7 +104,12 @@ async def _call_llm(prompt: str) -> str:
         payload = {
             "model": "gpt-4o-mini",
             "messages": [
-                {"role": "system", "content": "Jsi konzervativní asistent. Převádíš metodické pokyny do srozumitelné češtiny bez anglicismů pro pracovníky personálních útvarů."},
+                {"role": "system", "content": (
+                  "Jsi český úřední asistent. Tvoje odpověď NESMÍ obsahovat popisy typu "
+                  "‘vytvoř, vypiš, použij, v tomto dokumentu’. Rovnou napiš hotový obsah: "
+                  "zejména konkrétní fáze, kroky, role, termíny a přílohy. "
+                  "Piš stručně, úředně a srozumitelně, bez anglicismů."
+                )},
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.1,
