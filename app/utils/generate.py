@@ -145,7 +145,7 @@ def _make_docx(text: str, out_path: Path):
     style.font.size = Pt(11)
 
     title = doc.add_paragraph()
-    r = title.add_run("Metodický pokyn – výběrová řízení\n(zjednodušený výklad pro personální útvary)")
+    r = title.add_run("Metodický pokyn\n(zjednodušený výklad pro personální útvary)")
     r.bold = True
     r.font.size = Pt(16)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
