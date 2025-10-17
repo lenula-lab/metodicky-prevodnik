@@ -44,41 +44,34 @@ def _collect_corpus(input_dir: Path) -> str:
 
 def _build_prompt(corpus: str, audience: str, style: str, attachments: list[str]) -> str:
     return f"""
-Jsi pečlivý úřední pomocník. Z předaného textu metodického pokynu a příloh vytvoř HOTOVÝ, KONKRÉTNÍ návod pro administrativní pracovníky (bez anglicismů). Nepiš metatext (žádné „tento dokument popisuje…“). Metodika může být jakákoli (jiné fáze, role, termíny, přílohy).
+Jsi český jazykový asistent, který z metodických pokynů vytváří stručné, srozumitelné návody pro administrativní pracovníky veřejné správy. Nepopisuj, co budeš dělat – výstup rovnou napiš.
 
-VRAŤ DVA BLOKY:
-1) MARKDOWN_GUIDE – návod v češtině, přesně v této struktuře a pořadí:
+Použij následující formát a napiš konkrétní text, ne vysvětlení:
+
 # Metodický převodník
 (zjednodušený výklad pro administrativní pracovníky)
 
-## Úvod (max 6 vět)
-- Stručně účel, působnost, co výstup pokrývá.
+## Úvod
+Shrň smysl a účel pokynu ve 2–5 větách (bez metatextu).
 
 ## Přehled fází
-- V bodech (bez číslování), jen NÁZVY fází + 1 věta popisu každé (názvy vycházejí z korpusu).
+Vypiš skutečné fáze nebo kroky procesu z předaného textu.
+Každou popiš jednou větou, co se v ní děje.
 
 ## Kroky a odpovědnosti
-- Tabulka v markdownu se sloupci: **Kdo | Co | Jak | Do kdy | Přílohy**.
-- Buď konkrétní (role např. „odbor XY“, „schvalovatel“, „sekretariát“, „komise“…).
-- Do „Přílohy“ vkládej názvy souborů z níže uvedeného seznamu, pokud to dává smysl.
+Vytvoř tabulku:
+| Kdo | Co | Jak | Do kdy | Přílohy |
+Vyplň ji reálnými informacemi z pokynu a příloh.
+Použij jen přílohy, které dávají smysl pro daný krok: {attachments}.
 
 ## Na co si dát pozor
-- 5–8 konkrétních bodů: rizika, časté chyby, kontrolní body, varianty postupu.
+Uveď 5–8 konkrétních bodů – nejčastější chyby, rizika, nebo důležité
+upozornění vyplývající z pokynu.
 
-2) JSON_STRUCTURE – krátký strojově čitelný blok ve formátu kódu:
-```json
-{{
-  "phases": ["Název 1", "Název 2", "..."],
-  "roles": ["... (unikátní výčet rolí) ..."]
-}}
-```
+Text napiš v češtině, stručně, úředně a srozumitelně.
+Nepřidávej žádný úvod ani popis zadání, jen samotný výstup.
 
-POŽADAVKY:
-- Stručné, věcné, bez anglicismů, „návod pro uživatele“.
-- Používej konkrétní prvky z textu (pojmy, názvy, povinnosti, lhůty, vstupy/výstupy, přílohy).
-- Neodkazuj na neexistující přílohy. Máš k dispozici tyto soubory (pro sloupec „Přílohy“): {attachments}
-
-KORPUS:
+Zdrojový text, ze kterého čerpáš:
 {corpus}
 """
 
